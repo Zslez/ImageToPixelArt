@@ -1,3 +1,4 @@
+import os
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
@@ -31,6 +32,9 @@ class ImageToPixelArt:
     border_text = None
 
     border_c = None
+
+    folder = []
+    file_index = 0
 
 
     def __init__(self):
@@ -105,8 +109,8 @@ class ImageToPixelArt:
         setmenu.add_cascade(label = 'Border Color',     menu = colormenu)
         menubar.add_cascade(label = 'Settings',         menu = setmenu)
 
-        menubar.add_command(label = 'Theme', command = lambda: call('set_theme',
-            ['dark', 'light'][call("ttk::style", "theme", "use") == "sun-valley-dark"]))
+        #menubar.add_command(label = 'Theme', command = lambda: self.window.tk.call('set_theme',
+        #   ['dark', 'light'][self.window.tk.call("ttk::style", "theme", "use") == "sun-valley-dark"]))
         menubar.add_command(label = '?', command = lambda: '')
 
         menubar.entryconfig('Settings',     state = 'disabled')
@@ -126,44 +130,79 @@ class ImageToPixelArt:
 
         # displayed image
 
-        self.displayed = Label(window)
+        self.displayed = ttk.Label(window)
         self.displayed.pack()
 
         # text label displaying image size
 
-        self.size = Label(window, text = '')
+        self.size = ttk.Label(window)
         self.size.configure(font = ('pix PixelFJVerdana12pt', 6))
         self.size.pack()
 
         # sliders
 
-        self.border_c = DoubleVar()
-        self.border_slid = ttk.Scale(window, from_ = 0, to = self.max_a, length = self.num, orient = HORIZONTAL, variable = self.border_c)
-        self.border_slid.pack(side = 'bottom')
-        self.border_slid['state'] = 'disabled'
-
-        self.border_text = Label(window, text = 'Border')
-        self.border_text.configure(font = ('pix PixelFJVerdana12pt', 6))
-        self.border_text.pack(side = 'bottom')
+        self.slider_text = ttk.Label(window, text = 'Scale')
+        self.slider_text.configure(font = ('pix PixelFJVerdana12pt', 6))
+        self.slider_text.place(x = self.num // 2 - 15, y = self.num + 30)
 
         self.slider = ttk.Scale(window, from_ = 0, to = 1000, length = self.num, orient = HORIZONTAL)
-        self.slider.pack(side = 'bottom')
+        self.slider.place(x = 0, y = self.num + 50)
         self.slider['state'] = 'disabled'
 
-        self.slider_text = Label(window, text = 'Scale')
-        self.slider_text.configure(font = ('pix PixelFJVerdana12pt', 6))
-        self.slider_text.pack(side = 'bottom')
+        self.border_text = ttk.Label(window, text = 'Border')
+        self.border_text.configure(font = ('pix PixelFJVerdana12pt', 6))
+        self.border_text.place(x = self.num // 2 - 20, y = self.num + 70)
 
-        height = self.size.winfo_height() + self.slider_text.winfo_height() + self.border_text.winfo_height()
+        self.border_c = DoubleVar()
+        self.border_slid = ttk.Scale(window, from_ = 0, to = self.max_a, length = self.num, orient = HORIZONTAL, variable = self.border_c)
+        self.border_slid.place(x = 0, y = self.num + 90)
+        self.border_slid['state'] = 'disabled'
 
-        window.geometry(str(self.num) + 'x' + str(self.num + 120 + height))
+        window.geometry(str(self.num) + 'x' + str(self.num + 120))
 
         self.window = window
 
 
+    # FILE COMMANDS
+
+    def load_image(self, i):
+        path = self.folder[i]
+
+        self.img = Image.open(path)
+
+        imgtk = ImageTk.PhotoImage(self.img)
+
+        self.displayed.configure(image = imgtk)
+        self.displayed.image = imgtk
+
+        self.size.configure(text = str(self.img.size[0]) + 'x' + str(self.img.size[1]))
+        self.size.text = str(self.img.size[0]) + 'x' + str(self.img.size[1])
+
+        # get the widest between image width and height and resize the image to make it fit the screen
+
+        self.m = max(self.img.size)
+        self.resized = self.img.resize((self.num * self.img.size[0] // self.m, self.num * self.img.size[1] // self.m), 0)
+
+        # display the image
+
+        imgtk = ImageTk.PhotoImage(self.img)
+
+        self.displayed.configure(image = imgtk)
+        self.displayed.image = imgtk
+
+        # set the text label
+
+        self.size.configure(text = str(self.img.size[0]) + 'x' + str(self.img.size[1]))
+        self.size.text = str(self.img.size[0]) + 'x' + str(self.img.size[1])
+
+        self.slider.set(0)
+        self.ext = path.split('.')[-1]
+
+        self.window.title('ImageToPixelArt - ' + path.replace('\\', '/').split('/')[-1])
+
 
     def open_file(self):
-        # ask for file to open
+        '''ask for file to open and loads the image'''
 
         path = filedialog.askopenfilename(filetypes = [('Image File', file_ext)])
 
@@ -171,7 +210,7 @@ class ImageToPixelArt:
             self.img = Image.open(path)
         except AttributeError: # if the user closes the window without selecting any file
             return
-        
+
         # get the widest between image width and height and resize the image to make it fit the screen
 
         self.m = max(self.img.size)
@@ -208,10 +247,16 @@ class ImageToPixelArt:
 
         # set new title
 
-        self.window.title('ImageToPixelArt - ' + path.replace('\\', '/').split('/')[-1])
+        *self.folder, filename = path.replace('\\', '/').split('/')
+        self.folder = '/'.join(self.folder)
+        self.folder = [self.folder + '/' + i for i in os.listdir(self.folder) if '.' + i.split('.')[-1] in file_ext]
+        self.file_index = self.folder.index(path)
+        self.window.title('ImageToPixelArt - ' + filename)
 
 
     def file_save_big(self):
+        '''saves the displayed image with the original one's size'''
+
         if self.img:
             # ask to save file
 
@@ -227,6 +272,8 @@ class ImageToPixelArt:
 
 
     def file_save_small(self):
+        '''saves the displayed image with the displayed size'''
+
         if self.img:
             # ask to save file
 
@@ -242,7 +289,7 @@ class ImageToPixelArt:
 
 
     def close_file(self):
-        # set all variables back to default and block commands in menubar
+        '''set all variables back to default and block commands in menubar'''
 
         if self.img:
             self.img = None
@@ -250,8 +297,8 @@ class ImageToPixelArt:
             self.displayed.configure(image = None)
             self.displayed.image = None
 
-            self.size.configure(text = '')
-            self.size.text = ''
+            self.size.configure(text = None)
+            self.size.text = None
 
             self.slider.set(0)
             self.slider['state'] = 'disabled'
@@ -266,17 +313,22 @@ class ImageToPixelArt:
             self.filemenu.entryconfig('Save Small',     state = 'disabled')
             self.filemenu.entryconfig('Close',          state = 'disabled')
 
+            self.folder = []
+            self.file_index = 0
+
             self.window.title('ImageToPixelArt')
 
 
+    # OTHER MENU COMMANDS
+
     def change_num(self, c):
-        # change displayed image and window's size
+        '''change displayed image and window's size'''
 
         self.num = [128, 256, 384, 512][c]
-    
+
 
     def change_mode(self, mode):
-        # set the selected one between 'no borders' and 'yes borders'
+        '''set the selected one between 'no borders' and 'yes borders\''''
 
         self.mode = [0, 1][mode]
 
@@ -286,9 +338,9 @@ class ImageToPixelArt:
         else:
             self.setmenu.entryconfig('Border Color', state = 'normal')
             self.border_slid['state'] = 'normal'
-    
+
     def change_color(self, color):
-        # set new border color
+        '''set new border color'''
 
         self.border_color = [
             (  0,   0,   0),
@@ -307,10 +359,26 @@ class ImageToPixelArt:
         ][color]
 
 
+    # KEYPRESSES
+
+    def get_keypress(self, key: Event):
+        if len(self.folder):
+            if key.keycode == 37:
+                if self.file_index:
+                    self.file_index -= 1
+                    self.load_image(self.file_index)
+            elif key.keycode == 39:
+                if self.file_index < len(self.folder) - 1:
+                    self.file_index += 1
+                    self.load_image(self.file_index)
+
+
     # MAIN FUNCTION
 
     def update_image(self):
-        # if there's not image loaded, skip the loop and retry after 10 ms
+        '''updates the displayed image based on the sliders' values'''
+
+        # if there's not image loaded, skips the loop and retry after 10 ms
 
         if self.img:
             size = self.img.size
@@ -390,7 +458,10 @@ class ImageToPixelArt:
 
 
     def run(self):
+        '''run the GUI'''
+
         self.window.after(100, self.update_image)
+        self.window.bind('<Key>', self.get_keypress)
         self.window.mainloop()
 
 
