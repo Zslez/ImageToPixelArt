@@ -4,7 +4,10 @@ from tkinter import filedialog
 
 from PIL import Image, ImageTk
 
-file_ext = ['.jpg', '.png', '.jpeg']
+file_ext = [
+    '.avci', '.avcs', '.avif', '.avifs', '.bmp', '.cr2', '.eps', '.gif', '.heic', '.heics', '.heif', '.heifs',
+    '.jpeg', '.jpg', '.nef', '.orf', '.pbm', '.pgm', '.png', '.pnm', '.ppm', '.raw', '.sr2', '.tif', '.tiff', '.webp'
+]
 
 
 class ImageToPixelArt:
@@ -268,7 +271,7 @@ class ImageToPixelArt:
                 pix = self.small.load()
                 w, h = self.small.size
                 max_alpha = sorted(list(self.small.getdata()), key = lambda x: x[-1], reverse = True)[0][-1]
-                max_alpha_2 = 85 * max_alpha // 100
+                max_alpha_2 = 85 * (max_alpha ** 5) // ((255 ** 4) * 100)
 
                 if isinstance(pix[0, 0], tuple):
                     if len(pix[0, 0]) == 4:
