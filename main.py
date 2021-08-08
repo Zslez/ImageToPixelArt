@@ -1,10 +1,12 @@
 import os
 from tkinter import *
 from tkinter import ttk
+from tkinter import font 
 from tkinter import filedialog
 
 from PIL import Image, ImageTk
 
+# test cmd: cls && py -m cProfile -s tottime main.py
 
 file_ext = [
     '.avci', '.avcs', '.avif', '.avifs', '.bmp', '.cr2', '.eps', '.gif', '.heic', '.heics', '.heif', '.heifs',
@@ -31,10 +33,16 @@ class ImageToPixelArt:
     slider_text = None
     border_text = None
 
+    old_slider_value = (None, None)
+
     border_c = None
 
     folder = []
     file_index = 0
+
+    last_element = lambda _, x: x[-1]
+
+    denom = (255 ** 4) * 100
 
 
     def __init__(self):
@@ -43,6 +51,8 @@ class ImageToPixelArt:
 
         window.title('ImageToPixelArt')
         window.resizable(False, False)
+
+        default_font = font.Font(window, font = ('pix PixelFJVerdana12pt', 6))
 
         call = window.tk.call
 
@@ -85,7 +95,6 @@ class ImageToPixelArt:
         modemenu.add_command(label = 'Yes', command = lambda: self.change_mode(1))
         modemenu.add_command(label = 'No',  command = lambda: self.change_mode(0))
 
-
         # COLORS
 
         colormenu = Menu(menubar, tearoff = 0)
@@ -109,8 +118,8 @@ class ImageToPixelArt:
         setmenu.add_cascade(label = 'Border Color',     menu = colormenu)
         menubar.add_cascade(label = 'Settings',         menu = setmenu)
 
-        #menubar.add_command(label = 'Theme', command = lambda: self.window.tk.call('set_theme',
-        #   ['dark', 'light'][self.window.tk.call("ttk::style", "theme", "use") == "sun-valley-dark"]))
+        menubar.add_command(label = 'Theme', command = lambda: self.window.tk.call('set_theme',
+           ['dark', 'light'][self.window.tk.call("ttk::style", "theme", "use") == "sun-valley-dark"]))
         menubar.add_command(label = '?', command = lambda: '')
 
         menubar.entryconfig('Settings',     state = 'disabled')
@@ -126,37 +135,36 @@ class ImageToPixelArt:
 
         ## ==================== CONFIG ==================== ##
 
+        window.option_add('*Font', default_font)
+
         window.config(menu = self.menubar)
 
         # displayed image
 
-        self.displayed = ttk.Label(window)
+        self.displayed = Label(window)
         self.displayed.pack()
 
         # text label displaying image size
 
-        self.size = ttk.Label(window)
-        self.size.configure(font = ('pix PixelFJVerdana12pt', 6))
+        self.size = Label(window)
         self.size.pack()
 
         # sliders
 
-        self.slider_text = ttk.Label(window, text = 'Scale')
-        self.slider_text.configure(font = ('pix PixelFJVerdana12pt', 6))
-        self.slider_text.place(x = self.num // 2 - 15, y = self.num + 30)
-
-        self.slider = ttk.Scale(window, from_ = 0, to = 1000, length = self.num, orient = HORIZONTAL)
-        self.slider.place(x = 0, y = self.num + 50)
-        self.slider['state'] = 'disabled'
-
-        self.border_text = ttk.Label(window, text = 'Border')
-        self.border_text.configure(font = ('pix PixelFJVerdana12pt', 6))
-        self.border_text.place(x = self.num // 2 - 20, y = self.num + 70)
-
         self.border_c = DoubleVar()
         self.border_slid = ttk.Scale(window, from_ = 0, to = self.max_a, length = self.num, orient = HORIZONTAL, variable = self.border_c)
-        self.border_slid.place(x = 0, y = self.num + 90)
+        self.border_slid.pack(side = 'bottom')
         self.border_slid['state'] = 'disabled'
+
+        self.border_text = Label(window, text = 'Border')
+        self.border_text.pack(side = 'bottom')
+
+        self.slider = ttk.Scale(window, from_ = 0, to = 100, length = self.num, orient = HORIZONTAL)
+        self.slider.pack(side = 'bottom')
+        self.slider['state'] = 'disabled'
+
+        self.slider_text = Label(window, text = 'Scale')
+        self.slider_text.pack(side = 'bottom')
 
         window.geometry(str(self.num) + 'x' + str(self.num + 120))
 
@@ -197,6 +205,7 @@ class ImageToPixelArt:
 
         self.slider.set(0)
         self.ext = path.split('.')[-1]
+        self.old_slider_value = (None, None)
 
         self.window.title('ImageToPixelArt - ' + path.replace('\\', '/').split('/')[-1])
 
@@ -232,6 +241,7 @@ class ImageToPixelArt:
 
         self.slider['state'] = 'normal'
         self.slider.set(0)
+        self.old_slider_value = (None, None)
 
         # save the opened file extention, to use it as the default when saving the result
 
@@ -303,6 +313,8 @@ class ImageToPixelArt:
             self.slider.set(0)
             self.slider['state'] = 'disabled'
 
+            self.old_slider_value = (None, None)
+
             self.border_slid.set(0)
             self.border_slid['state'] = 'disabled'
 
@@ -325,12 +337,14 @@ class ImageToPixelArt:
         '''change displayed image and window's size'''
 
         self.num = [128, 256, 384, 512][c]
+        self.old_slider_value = (None, None)
 
 
     def change_mode(self, mode):
         '''set the selected one between 'no borders' and 'yes borders\''''
 
         self.mode = [0, 1][mode]
+        self.old_slider_value = (None, None)
 
         if mode == 0:
             self.setmenu.entryconfig('Border Color', state = 'disabled')
@@ -358,6 +372,8 @@ class ImageToPixelArt:
             ( 80,  60,  30)
         ][color]
 
+        self.old_slider_value = (None, None)
+
 
     # KEYPRESSES
 
@@ -380,16 +396,18 @@ class ImageToPixelArt:
 
         # if there's not image loaded, skips the loop and retry after 10 ms
 
-        if self.img:
+        slid, b_slid = self.slider.get(), self.border_slid.get()
+
+        if self.img and (slid, b_slid) != self.old_slider_value:
+            self.old_slider_value = slid, b_slid
             size = self.img.size
-            val = self.slider.get() * (max(size) // 2 + 1) // 1000
+            val = slid * (self.m // 2 + 1) // 100
             w1, h1 = size
-            m = max(size)
 
             # if the slider value is 0, simply display the same image
 
             if not val:
-                res = self.img.resize((self.num * w1 // m, self.num * h1 // m), 0)
+                res = self.img.resize((self.num * w1 // self.m, self.num * h1 // self.m), 0)
 
                 txt = str(w1) + 'x' + str(h1)
                 self.size.configure(text = txt)
@@ -418,29 +436,35 @@ class ImageToPixelArt:
                     if len(pix[0, 0]) == 4:
                         # get the highest alpha value of the image
 
-                        max_alpha = sorted(list(self.small.getdata()), key = lambda x: x[-1], reverse = True)[0][-1]
+                        max_alpha = sorted(self.small.split()[-1].getdata())[-1]
 
                         # get the highest and the lowest value that gets replaced
 
                         max_alpha_2 = max_alpha ** 5
-                        max_alpha_3 = self.border_slid.get() * max_alpha_2 // ((255 ** 4) * 100)
-                        max_alpha_2 = self.max_a * max_alpha_2 // ((255 ** 4) * 100)
+                        max_alpha_3 = b_slid * max_alpha_2 // (self.denom)
+                        max_alpha_2 = self.max_a * max_alpha_2 // (self.denom)
+                        bc = self.border_color
+                        transparent = (0, 0, 0, 0)
 
                         # replace
 
-                        for i in range(w * h):
-                            x, y = i % w, i // w
+                        # this part can be really slow if the image is big :(
+                        # it loops through all pixels and checks their alpha value
 
-                            if max_alpha_3 < pix[x, y][-1] < max_alpha_2:
-                                pix[x, y] = self.border_color + (max_alpha, )
-                            elif pix[x, y][-1] >= max_alpha_2:
-                                pix[x, y] = pix[x, y][:-1]
-                            else:
-                                pix[x, y] = (0, 0, 0, 0)
+                        for i in range(w * h):
+                            j = i % w, i // w
+                            p = pix[j][-1]
+
+                            if p == 0:
+                                continue
+                            elif p <= max_alpha_3:
+                                pix[j] = transparent
+                            elif max_alpha_3 < p < max_alpha_2:
+                                pix[j] = bc + (max_alpha, )
 
             # resize small image to make it fit the screen
 
-            res = self.small.resize((self.num * w1 // m, self.num * h1 // m), 0)
+            res = self.small.resize((self.num * w1 // self.m, self.num * h1 // self.m), 0)
             tkimg = ImageTk.PhotoImage(res)
 
             # change text label
