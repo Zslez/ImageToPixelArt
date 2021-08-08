@@ -1,7 +1,7 @@
 # ImageToPixelArt
 
-[![a](https://www.code-inspector.com/project/26184/score/svg)](https://github.com/Zslez)
-[![a](https://www.code-inspector.com/project/26184/status/svg)](https://github.com/Zslez)
+[![a](https://www.code-inspector.com/project/26184/score/svg)](https://www.code-inspector.com/project/26184/score/svg)
+[![a](https://www.code-inspector.com/project/26184/status/svg)](https://www.code-inspector.com/project/26184/score/svg)
 
 ## Description
 
@@ -12,16 +12,16 @@ It has still few features as it's a new project, and has also a very simple GUI,
 
 ## How to use
 
-Just copy the `main.py` file.
-If you want to use the same theme and font I used,download the [Tkinter Theme](#tkinter-theme-used) and the [Font](#font-used), otherwise you can remove or comment out the following lines from `main.py`:
+Just copy the `main.py` file.  
+If you want to use the same theme and font I used, download the [Tkinter Theme](#tkinter-theme-used) and the [Font](#font-used), otherwise you can remove or comment out the following lines from `main.py`:
 
 - to remove the **theme**:
-  - from [57](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L57) to [60](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L60)
-  - [121](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L121)
-  - [122](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L122)
+  - from [63](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L63) to [66](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L66)
+  - [127](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L127)
+  - [128](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L128)
 - to remove the **font**:
-  - [55](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L55)
-  - [138](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#138)
+  - [61](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L61)
+  - [134](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#134)
 
 ![ImageToPixelArt Gif](images/itpa.gif)
 
@@ -86,3 +86,5 @@ Otherwise, if you really want to contribute but you don't know how, you can
 ---
 
 **Really hope you enjoy this project.** 😁
+
+---
