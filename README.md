@@ -8,12 +8,12 @@
 Simple and fast tool to scale down images and make them look like Pixel Art.
 It also has a very simple border detection algorithm that allows you to add a border to the image.
 
-It has still few features as it's a new project, and has also a very simple GUI, so I'll appreciate any [contribution](#Contribute) or suggestion for this project.
+It has still few features as it's a new project, and has also a very simple GUI, so I'll appreciate any [contribution](#contribute) or suggestion for this project.
 
 ## How to use
 
 Just copy the `main.py` file.
-If you want to use the same theme and font I used,download the [Tkinter Theme](#Tkinter_Theme_Used) and the [Font](#Font_Used), otherwise you can remove or comment out the following lines from `main.py`:
+If you want to use the same theme and font I used,download the [Tkinter Theme](#tkinter-theme-used) and the [font](#font-used), otherwise you can remove or comment out the following lines from `main.py`:
 
 - to remove the **theme**:
   - from [57](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L57) to [60](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L60)
