@@ -1,24 +1,31 @@
-import os
-from tkinter import *
+from tkinter import Tk
+from tkinter import Menu
+from tkinter import Label
+from tkinter import DoubleVar
+
 from tkinter import ttk
-from tkinter import font 
+from tkinter import font
 from tkinter import filedialog
 
 from PIL import Image, ImageTk
 
+import os
+
 # test cmd: cls && py -m cProfile -s tottime main.py
 
 file_ext = [
-    '.avci', '.avcs', '.avif', '.avifs', '.bmp', '.cr2', '.eps', '.gif', '.heic', '.heics', '.heif', '.heifs',
-    '.jpeg', '.jpg', '.nef', '.orf', '.pbm', '.pgm', '.png', '.pnm', '.ppm', '.raw', '.sr2', '.tif', '.tiff', '.webp'
+    '.avci', '.avcs', '.avif', '.avifs', '.bmp', '.cr2',
+    '.eps', '.gif', '.heic', '.heics', '.heif', '.heifs',
+    '.jpeg', '.jpg', '.nef', '.orf', '.pbm', '.pgm', '.png',
+    '.pnm', '.ppm', '.raw', '.sr2', '.tif', '.tiff', '.webp'
 ]
 
 
 class ImageToPixelArt:
-    m = None
     ext = None
     img = None
     size = None
+    max_l = None
     small = None
     resized = None
     displayed = None
@@ -47,12 +54,11 @@ class ImageToPixelArt:
 
     def __init__(self):
         window = Tk()
-        window = window
 
         window.title('ImageToPixelArt')
         window.resizable(False, False)
 
-        default_font = font.Font(window, font = ('pix PixelFJVerdana12pt', 6))
+        default_font = font.Font(window, ('pix PixelFJVerdana12pt', 6))
 
         call = window.tk.call
 
@@ -118,8 +124,8 @@ class ImageToPixelArt:
         setmenu.add_cascade(label = 'Border Color',     menu = colormenu)
         menubar.add_cascade(label = 'Settings',         menu = setmenu)
 
-        menubar.add_command(label = 'Theme', command = lambda: self.window.tk.call('set_theme',
-           ['dark', 'light'][self.window.tk.call("ttk::style", "theme", "use") == "sun-valley-dark"]))
+        menubar.add_command(label = 'Theme', command = lambda: call('set_theme',
+            ['dark', 'light'][call("ttk::style", "theme", "use") == "sun-valley-dark"]))
         menubar.add_command(label = '?', command = lambda: '')
 
         menubar.entryconfig('Settings',     state = 'disabled')
@@ -152,14 +158,15 @@ class ImageToPixelArt:
         # sliders
 
         self.border_c = DoubleVar()
-        self.border_slid = ttk.Scale(window, from_ = 0, to = self.max_a, length = self.num, orient = HORIZONTAL, variable = self.border_c)
+        self.border_slid = ttk.Scale(window, from_ = 0, to = self.max_a,
+            length = self.num, orient = 'horizontal', variable = self.border_c)
         self.border_slid.pack(side = 'bottom')
         self.border_slid['state'] = 'disabled'
 
         self.border_text = Label(window, text = 'Border')
         self.border_text.pack(side = 'bottom')
 
-        self.slider = ttk.Scale(window, from_ = 0, to = 100, length = self.num, orient = HORIZONTAL)
+        self.slider = ttk.Scale(window, from_ = 0, to = 100, length = self.num, orient = 'horizontal')
         self.slider.pack(side = 'bottom')
         self.slider['state'] = 'disabled'
 
@@ -186,10 +193,14 @@ class ImageToPixelArt:
         self.size.configure(text = str(self.img.size[0]) + 'x' + str(self.img.size[1]))
         self.size.text = str(self.img.size[0]) + 'x' + str(self.img.size[1])
 
-        # get the widest between image width and height and resize the image to make it fit the screen
+        # get the widest between image width and height
+        # and resize the image to make it fit the screen
 
-        self.m = max(self.img.size)
-        self.resized = self.img.resize((self.num * self.img.size[0] // self.m, self.num * self.img.size[1] // self.m), 0)
+        self.max_l = max(self.img.size)
+        self.resized = self.img.resize(
+            (self.num * self.img.size[0] // self.max_l, self.num * self.img.size[1] // self.max_l),
+            0
+        )
 
         # display the image
 
@@ -220,10 +231,14 @@ class ImageToPixelArt:
         except AttributeError: # if the user closes the window without selecting any file
             return
 
-        # get the widest between image width and height and resize the image to make it fit the screen
+        # get the widest between image width and height
+        # and resize the image to make it fit the screen
 
-        self.m = max(self.img.size)
-        self.resized = self.img.resize((self.num * self.img.size[0] // self.m, self.num * self.img.size[1] // self.m), 0)
+        self.max_l = max(self.img.size)
+        self.resized = self.img.resize(
+            (self.num * self.img.size[0] // self.max_l, self.num * self.img.size[1] // self.max_l),
+            0
+        )
 
         # display the image
 
@@ -259,7 +274,10 @@ class ImageToPixelArt:
 
         *self.folder, filename = path.replace('\\', '/').split('/')
         self.folder = '/'.join(self.folder)
-        self.folder = [self.folder + '/' + i for i in os.listdir(self.folder) if '.' + i.split('.')[-1] in file_ext]
+        self.folder = [
+            self.folder + '/' + i for i in os.listdir(self.folder)
+            if '.' + i.split('.')[-1] in file_ext
+        ]
         self.file_index = self.folder.index(path)
         self.window.title('ImageToPixelArt - ' + filename)
 
@@ -270,13 +288,16 @@ class ImageToPixelArt:
         if self.img:
             # ask to save file
 
-            path = filedialog.asksaveasfile(mode = 'w', filetypes = [('Image File', file_ext)], defaultextension = self.ext)
+            path = filedialog.asksaveasfile(
+                mode = 'w',
+                filetypes = [('Image File', file_ext)], defaultextension = self.ext
+            )
 
             try:
                 # resize the pixeled image to the original image's size and save it
 
                 self.small.resize(self.img.size, 0).save(path.name)
-                path.close
+                path.close()
             except AttributeError:
                 pass
 
@@ -287,13 +308,16 @@ class ImageToPixelArt:
         if self.img:
             # ask to save file
 
-            path = filedialog.asksaveasfile(mode = 'w', filetypes = [('Image File', file_ext)], defaultextension = self.ext)
+            path = filedialog.asksaveasfile(
+                mode = 'w',
+                filetypes = [('Image File', file_ext)], defaultextension = self.ext
+            )
 
             try:
                 # save the small image
 
                 self.small.save(path.name)
-                path.close
+                path.close()
             except AttributeError:
                 pass
 
@@ -333,10 +357,10 @@ class ImageToPixelArt:
 
     # OTHER MENU COMMANDS
 
-    def change_num(self, c):
+    def change_num(self, new_num):
         '''change displayed image and window's size'''
 
-        self.num = [128, 256, 384, 512][c]
+        self.num = [128, 256, 384, 512][new_num]
         self.old_slider_value = (None, None)
 
 
@@ -377,8 +401,8 @@ class ImageToPixelArt:
 
     # KEYPRESSES
 
-    def get_keypress(self, key: Event):
-        if len(self.folder):
+    def get_keypress(self, key):
+        if len(self.folder) != 0:
             if key.keycode == 37:
                 if self.file_index:
                     self.file_index -= 1
@@ -388,6 +412,25 @@ class ImageToPixelArt:
                     self.file_index += 1
                     self.load_image(self.file_index)
 
+
+    def display_image(self):
+        # resize small image to make it fit the screen
+
+        width, height = self.img.size
+
+        res = self.small.resize((self.num * width // self.max_l, self.num * height // self.max_l), 0)
+        tkimg = ImageTk.PhotoImage(res)
+
+        # change text label
+
+        txt = str(self.small.size[0]) + 'x' + str(self.small.size[1])
+        self.size.configure(text = txt)
+        self.size.text = txt
+
+        # display resized image
+
+        self.displayed.configure(image = tkimg)
+        self.displayed.image = tkimg
 
     # MAIN FUNCTION
 
@@ -401,15 +444,15 @@ class ImageToPixelArt:
         if self.img and (slid, b_slid) != self.old_slider_value:
             self.old_slider_value = slid, b_slid
             size = self.img.size
-            val = slid * (self.m // 2 + 1) // 100
-            w1, h1 = size
+            val = slid * (self.max_l // 2 + 1) // 100
+            width1, height1 = size
 
             # if the slider value is 0, simply display the same image
 
             if not val:
-                res = self.img.resize((self.num * w1 // self.m, self.num * h1 // self.m), 0)
+                res = self.img.resize((self.num * width1 // self.max_l, self.num * height1 // self.max_l), 0)
 
-                txt = str(w1) + 'x' + str(h1)
+                txt = str(width1) + 'x' + str(height1)
                 self.size.configure(text = txt)
                 self.size.text = txt
 
@@ -424,59 +467,52 @@ class ImageToPixelArt:
             # scale down image by the selected value
 
             val = 1.0 / val
-            self.small = self.img.resize((max(int(w1 * val), 1), max(int(h1 * val), 1)))
+            self.small = self.img.resize((max(int(width1 * val), 1), max(int(height1 * val), 1)))
 
-            if self.mode:
-                pix = self.small.load()
-                w, h = self.small.size
+            if not self.mode:
+                self.display_image()
+                self.window.after(10, self.update_image)
+                return
 
-                # if pixels have the alpha channel replace the most transparest ones with the border
+            pix = self.small.load()
+            width, height = self.small.size
 
-                if isinstance(pix[0, 0], tuple):
-                    if len(pix[0, 0]) == 4:
-                        # get the highest alpha value of the image
+            # if pixels have the alpha channel replace the most transparest ones with the border
 
-                        max_alpha = sorted(self.small.split()[-1].getdata())[-1]
+            if (not isinstance(pix[0, 0], tuple)) or len(tuple(pix[0, 0])) != 4:
+                self.display_image()
+                self.window.after(10, self.update_image)
+                return
 
-                        # get the highest and the lowest value that gets replaced
+            # get the highest alpha value of the image
 
-                        max_alpha_2 = max_alpha ** 5
-                        max_alpha_3 = b_slid * max_alpha_2 // (self.denom)
-                        max_alpha_2 = self.max_a * max_alpha_2 // (self.denom)
-                        bc = self.border_color
-                        transparent = (0, 0, 0, 0)
+            max_alpha = sorted(self.small.split()[-1].getdata())[-1]
 
-                        # replace
+            # get the highest and the lowest value that gets replaced
 
-                        # this part can be really slow if the image is big :(
-                        # it loops through all pixels and checks their alpha value
+            max_alpha_2 = max_alpha ** 5
+            max_alpha_3 = b_slid * max_alpha_2 // (self.denom)
+            max_alpha_2 = self.max_a * max_alpha_2 // (self.denom)
+            bor_c = self.border_color
+            transparent = (0, 0, 0, 0)
 
-                        for i in range(w * h):
-                            j = i % w, i // w
-                            p = pix[j][-1]
+            # replace
 
-                            if p == 0:
-                                continue
-                            elif p <= max_alpha_3:
-                                pix[j] = transparent
-                            elif max_alpha_3 < p < max_alpha_2:
-                                pix[j] = bc + (max_alpha, )
+            # this part can be really slow if the image is big :(
+            # it loops through all pixels and checks their alpha value
 
-            # resize small image to make it fit the screen
+            for i in range(width * height):
+                index = i % width, i // width
+                pixel = pix[index][-1]
 
-            res = self.small.resize((self.num * w1 // self.m, self.num * h1 // self.m), 0)
-            tkimg = ImageTk.PhotoImage(res)
+                if pixel == 0:
+                    continue
+                elif pixel <= max_alpha_3:
+                    pix[index] = transparent
+                elif max_alpha_3 < pixel < max_alpha_2:
+                    pix[index] = bor_c + (max_alpha,)
 
-            # change text label
-
-            txt = str(self.small.size[0]) + 'x' + str(self.small.size[1])
-            self.size.configure(text = txt)
-            self.size.text = txt
-
-            # display resized image
-
-            self.displayed.configure(image = tkimg)
-            self.displayed.image = tkimg
+            self.display_image()
 
         self.window.after(10, self.update_image)
 
