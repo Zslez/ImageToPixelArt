@@ -1,3 +1,6 @@
+import os
+import sys
+
 from tkinter import Tk
 from tkinter import Menu
 from tkinter import Label
@@ -8,8 +11,6 @@ from tkinter import font
 from tkinter import filedialog
 
 from PIL import Image, ImageTk
-
-import os
 
 # test cmd: cls && py -m cProfile -s tottime main.py
 
@@ -166,7 +167,14 @@ class ImageToPixelArt:
         self.border_text = Label(window, text = 'Border')
         self.border_text.pack(side = 'bottom')
 
-        self.slider = ttk.Scale(window, from_ = 0, to = 100, length = self.num, orient = 'horizontal')
+        self.slider = ttk.Scale(
+            window,
+            from_ = 0,
+            to = 100,
+            length = self.num,
+            orient = 'horizontal'
+        )
+
         self.slider.pack(side = 'bottom')
         self.slider['state'] = 'disabled'
 
@@ -403,14 +411,25 @@ class ImageToPixelArt:
 
     def get_keypress(self, key):
         if len(self.folder) != 0:
-            if key.keycode == 37:
-                if self.file_index:
-                    self.file_index -= 1
-                    self.load_image(self.file_index)
-            elif key.keycode == 39:
-                if self.file_index < len(self.folder) - 1:
-                    self.file_index += 1
-                    self.load_image(self.file_index)
+            plat = sys.platform
+            if plat == 'win32':
+                if key.keycode == 37:
+                    if self.file_index:
+                        self.file_index -= 1
+                        self.load_image(self.file_index)
+                elif key.keycode == 39:
+                    if self.file_index < len(self.folder) - 1:
+                        self.file_index += 1
+                        self.load_image(self.file_index)
+            elif plat == 'darwin':
+                if key.keycode == 8124162:
+                    if self.file_index:
+                        self.file_index -= 1
+                        self.load_image(self.file_index)
+                elif key.keycode == 8189699:
+                    if self.file_index < len(self.folder) - 1:
+                        self.file_index += 1
+                        self.load_image(self.file_index)
 
 
     def display_image(self):
@@ -418,7 +437,11 @@ class ImageToPixelArt:
 
         width, height = self.img.size
 
-        res = self.small.resize((self.num * width // self.max_l, self.num * height // self.max_l), 0)
+        res = self.small.resize(
+            (self.num * width // self.max_l, self.num * height // self.max_l),
+            0
+        )
+
         tkimg = ImageTk.PhotoImage(res)
 
         # change text label
@@ -450,7 +473,10 @@ class ImageToPixelArt:
             # if the slider value is 0, simply display the same image
 
             if not val:
-                res = self.img.resize((self.num * width1 // self.max_l, self.num * height1 // self.max_l), 0)
+                res = self.img.resize(
+                    (self.num * width1 // self.max_l, self.num * height1 // self.max_l),
+                    0
+                )
 
                 txt = str(width1) + 'x' + str(height1)
                 self.size.configure(text = txt)
@@ -507,7 +533,8 @@ class ImageToPixelArt:
 
                 if pixel == 0:
                     continue
-                elif pixel <= max_alpha_3:
+
+                if pixel <= max_alpha_3:
                     pix[index] = transparent
                 elif max_alpha_3 < pixel < max_alpha_2:
                     pix[index] = bor_c + (max_alpha,)
