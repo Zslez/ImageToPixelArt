@@ -1,7 +1,7 @@
 # ImageToPixelArt
 
-[![a](https://www.code-inspector.com/project/26184/score/svg)](https://www.code-inspector.com/project/26184/score/svg)
-[![a](https://www.code-inspector.com/project/26184/status/svg)](https://www.code-inspector.com/project/26184/score/svg)
+[![Code Score](https://www.code-inspector.com/project/26184/score/svg?service=github)](https://www.code-inspector.com/project/26184/score/svg)
+[![Code Status](https://www.code-inspector.com/project/26184/status/svg)](https://www.code-inspector.com/project/26184/score/svg)
 
 ## Description
 
@@ -16,12 +16,14 @@ Just copy the `main.py` file.
 If you want to use the same theme and font I used, download the [Tkinter Theme](#tkinter-theme-used) and the [Font](#font-used), otherwise you can remove or comment out the following lines from `main.py`:
 
 - to remove the **theme**:
-  - from [63](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L63) to [66](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L66)
-  - [127](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L127)
+  - [64](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L64)
+  - [66](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L66)
+  - [67](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L67)
   - [128](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L128)
+  - [129](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L129)
 - to remove the **font**:
-  - [61](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L61)
-  - [134](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#134)
+  - [62](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L62)
+  - [145](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#145)
 
 ![ImageToPixelArt Gif](images/itpa.gif)
 
@@ -65,6 +67,30 @@ If you want to use the same theme and font I used, download the [Tkinter Theme](
 ![32x32 Donut Big](images/32x32_donut_big.png)
 ![32x32 Donut](images/32x32_donut.png)
 
+## Checklist
+
+- Tests
+  - [x] Test on Windows [*](#tested-on)
+  - [x] Test on MacOS [**](#tested-on)
+  - [ ] Test on Linux
+- General
+  - [ ] Speed up [the loop that checks for borders](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L518)
+- Features
+  - [ ] Possibility to choose a custom color for the border
+  - [ ] New sliders for hue and saturation
+
+## Tested on
+
+- **Windows 10 Home 20H2**
+  - **Python 3.8.6**
+  - with Theme
+  - with Font
+
+- **MacOS High Sierra 17.7.0**
+  - **Python 3.9.0**
+  - without Theme
+  - without Font
+
 ## Contribute
 
 ---
@@ -73,11 +99,11 @@ If you want to use the same theme and font I used, download the [Tkinter Theme](
 
 ---
 
-If you want to contribute I can reccomend taking a look at open [issues](https://github.com/Zslez/ImageToPixelArt/issues), if there are any.
+If you want to contribute I can reccomend taking a look at open [issues](https://github.com/Zslez/ImageToPixelArt/issues) or at unchecked stuff on the [Checklist](#Checklist).
 
-Also I'd really like it if you could improve the GUI, I'm not really creative to be honest.
+Also, I'd really like it if you could create a nice looking GUI, I'm not really creative to be honest. 😩
 
-Anyway, you can always **[suggest new features](https://github.com/Zslez/Zslez#-how-to-reach-me)** or directly **[open pull requests](https://github.com/Zslez/ImageToPixelArt/compare)** if you already have one, **fix typos**, **speed up algorithms** and literally **anything else** that will somehow improve the code.
+Anyway, you can always **[suggest new features](https://github.com/Zslez/Zslez#-how-to-reach-me)**, **fix typos**, **speed up algorithms** and literally **anything else** that will somehow improve the code.
 
 Otherwise, if you really want to contribute but you don't know how, you can
 
@@ -85,6 +111,6 @@ Otherwise, if you really want to contribute but you don't know how, you can
 
 ---
 
-**Really hope you enjoy this project.** 😁
+**Hope you enjoy this project.** 😁
 
 ---
