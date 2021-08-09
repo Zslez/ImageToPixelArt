@@ -76,7 +76,9 @@ If you want to use the same theme and font I used, download the [Tkinter Theme](
 - General
   - [ ] Speed up [the loop that checks for borders](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L518)
 - Features
-  - [ ] Possibility to choose a custom color for the border
+  - [ ] Possibility of choosing a custom color for the border
+  - [ ] Possibility of removing extra transparent lines
+  - [ ] Possibility of cutting the image to square
   - [ ] New sliders for hue and saturation
 
 ## Tested on
