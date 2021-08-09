@@ -70,8 +70,8 @@ If you want to use the same theme and font I used, download the [Tkinter Theme](
 ## Checklist
 
 - Tests
-  - [x] Test on Windows [*](#tested-on)
-  - [x] Test on MacOS [**](#tested-on)
+  - [x] Test on Windows ([see tests](#tested-on))
+  - [x] Test on MacOS ([see tests](#tested-on))
   - [ ] Test on Linux
 - General
   - [ ] Speed up [the loop that checks for borders](https://github.com/Zslez/ImageToPixelArt/blob/master/main.py#L518)
